@@ -192,7 +192,7 @@
     <h1>Consulta tus Tickets</h1>
 
     <p>
-      Ingresa tu código de cliente para verificar tus tickets asignados
+      Ingresa tu usuario y contraseña para verificar tus tickets asignados
       para el sorteo de Elliot.
     </p>
 
@@ -214,8 +214,16 @@
 
     <input 
       type="text" 
-      id="codigoCliente" 
-      placeholder="Ejemplo: ADM1106"
+      id="usuario" 
+      placeholder="Usuario: ADM1106"
+      onclick="limpiarConsulta()" 
+      onfocus="limpiarConsulta()"
+    >
+
+    <input 
+      type="password" 
+      id="contrasena" 
+      placeholder="Contraseña"
       onclick="limpiarConsulta()" 
       onfocus="limpiarConsulta()"
     >
@@ -227,11 +235,11 @@
     </a>
 
     <div class="cargando" id="cargando">
-      Cargando datos...
+      Verificando datos...
     </div>
 
     <div class="error" id="error">
-      No se encontraron tickets con ese código.
+      Usuario o contraseña incorrectos.
     </div>
 
     <div class="resultado" id="resultado"></div>
@@ -243,45 +251,7 @@
   </div>
 
   <script>
-    const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR85QSA7AJ7JxtHvIr38POOMVvRlOPRu-if79NTx87eipTZQq2EejVKkwjormyU_S_b5MOXtBeubjE9/pub?gid=0&single=true&output=csv";
-
-    let participantes = [];
-
-    async function cargarDatos() {
-      const cargando = document.getElementById("cargando");
-      const error = document.getElementById("error");
-
-      try {
-        cargando.style.display = "block";
-
-        const respuesta = await fetch(GOOGLE_SHEET_CSV_URL);
-        const texto = await respuesta.text();
-
-        const filas = texto.trim().split("\n").slice(1);
-
-        participantes = filas.map(fila => {
-          const columnas = fila.split(",");
-
-          return {
-            nombre: limpiarTexto(columnas[0]),
-            codigo: limpiarTexto(columnas[1]),
-            tickets: limpiarTexto(columnas[2]).split("|").map(t => t.trim()),
-            estado: limpiarTexto(columnas[3])
-          };
-        });
-
-        cargando.style.display = "none";
-      } catch (e) {
-        cargando.style.display = "none";
-        error.innerText = "No se pudieron cargar los datos. Revisa el enlace de Google Sheets.";
-        error.style.display = "block";
-      }
-    }
-
-    function limpiarTexto(texto) {
-      if (!texto) return "";
-      return texto.replace(/"/g, "").trim();
-    }
+    const API_URL = "PEGA_AQUI_TU_LINK_DE_APPS_SCRIPT";
 
     function limpiarConsulta() {
       const resultado = document.getElementById("resultado");
@@ -292,51 +262,64 @@
       error.style.display = "none";
     }
 
-    function buscarTickets() {
-      const codigoIngresado = document.getElementById("codigoCliente").value.trim();
+    async function buscarTickets() {
+      const usuario = document.getElementById("usuario").value.trim();
+      const contrasena = document.getElementById("contrasena").value.trim();
+
       const resultado = document.getElementById("resultado");
       const error = document.getElementById("error");
+      const cargando = document.getElementById("cargando");
 
       resultado.innerHTML = "";
       resultado.style.display = "none";
       error.style.display = "none";
 
-      if (codigoIngresado === "") {
-        error.innerText = "Por favor ingresa tu código de cliente.";
+      if (usuario === "" || contrasena === "") {
+        error.innerText = "Por favor ingresa tu usuario y contraseña.";
         error.style.display = "block";
         return;
       }
 
-      const cliente = participantes.find(
-        persona => persona.codigo.toLowerCase() === codigoIngresado.toLowerCase()
-      );
+      try {
+        cargando.style.display = "block";
 
-      if (!cliente) {
-        error.innerText = "No se encontraron tickets con ese código. Verifica que esté escrito correctamente.";
+        const url = API_URL + "?usuario=" + encodeURIComponent(usuario) + "&contrasena=" + encodeURIComponent(contrasena);
+        const respuesta = await fetch(url);
+        const datos = await respuesta.json();
+
+        cargando.style.display = "none";
+
+        if (!datos.ok) {
+          error.innerText = "Usuario o contraseña incorrectos. Verifica tus datos.";
+          error.style.display = "block";
+          return;
+        }
+
+        let ticketsHTML = "";
+
+        datos.tickets.forEach(ticket => {
+          ticketsHTML += `<div class="ticket">${ticket}</div>`;
+        });
+
+        resultado.innerHTML = `
+          <div class="card">
+            <h2>${datos.nombre}</h2>
+            <p><strong>Usuario:</strong> ${datos.usuario}</p>
+            <p><strong>Celular:</strong> ${datos.celular}</p>
+            <p><strong>Estado:</strong> ${datos.estado}</p>
+            <p><strong>Tickets asignados:</strong></p>
+            ${ticketsHTML}
+          </div>
+        `;
+
+        resultado.style.display = "block";
+
+      } catch (e) {
+        cargando.style.display = "none";
+        error.innerText = "No se pudo conectar con la base de datos. Revisa el enlace de Apps Script.";
         error.style.display = "block";
-        return;
       }
-
-      let ticketsHTML = "";
-
-      cliente.tickets.forEach(ticket => {
-        ticketsHTML += `<div class="ticket">${ticket}</div>`;
-      });
-
-      resultado.innerHTML = `
-        <div class="card">
-          <h2>${cliente.nombre}</h2>
-          <p><strong>Código de cliente:</strong> ${cliente.codigo}</p>
-          <p><strong>Estado:</strong> ${cliente.estado}</p>
-          <p><strong>Tickets asignados:</strong></p>
-          ${ticketsHTML}
-        </div>
-      `;
-
-      resultado.style.display = "block";
     }
-
-    cargarDatos();
   </script>
 </body>
 </html>
