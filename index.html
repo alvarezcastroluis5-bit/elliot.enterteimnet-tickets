@@ -284,7 +284,7 @@
   </div>
 
   <script>
-    const API_URL = "PEGA_AQUI_TU_LINK_DE_APPS_SCRIPT";
+    const API_URL = "https://script.google.com/macros/s/AKfycbypIkr58k2XQx6dFwXqoUCBvAJSTphYWL9IoMqt-3tHOTLT1c_ALXtHKllSMo2hMvpz6Q/exec";
 
     let usuarioSesion = "";
     let contrasenaSesion = "";
@@ -310,7 +310,7 @@
       usuarioSesion = usuario;
       contrasenaSesion = contrasena;
 
-      await consultarBaseDatos(usuarioSesion, contrasenaSesion, true);
+      await consultarBaseDatos(usuarioSesion, contrasenaSesion);
     }
 
     async function actualizarTickets() {
@@ -320,10 +320,10 @@
         return;
       }
 
-      await consultarBaseDatos(usuarioSesion, contrasenaSesion, false);
+      await consultarBaseDatos(usuarioSesion, contrasenaSesion);
     }
 
-    async function consultarBaseDatos(usuario, contrasena, iniciarSesion) {
+    async function consultarBaseDatos(usuario, contrasena) {
       const resultado = document.getElementById("resultado");
       const error = document.getElementById("error");
       const cargando = document.getElementById("cargando");
@@ -362,7 +362,9 @@
         let ticketsHTML = "";
 
         datos.tickets.forEach(ticket => {
-          ticketsHTML += `<div class="ticket">${ticket}</div>`;
+          if (ticket !== "") {
+            ticketsHTML += `<div class="ticket">${ticket}</div>`;
+          }
         });
 
         resultado.innerHTML = `
