@@ -15,7 +15,12 @@
 
     body {
       min-height: 100vh;
-      background: linear-gradient(135deg, #050816, #0f172a, #1e293b);
+      background:
+        linear-gradient(rgba(5, 8, 22, 0.82), rgba(15, 23, 42, 0.90)),
+        url("fondo.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
       color: white;
       display: flex;
       justify-content: center;
@@ -32,6 +37,7 @@
       padding: 30px;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
       text-align: center;
+      backdrop-filter: blur(8px);
     }
 
     .logo-img {
