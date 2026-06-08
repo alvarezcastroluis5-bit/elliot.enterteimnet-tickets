@@ -106,10 +106,35 @@
       font-size: 17px;
       font-weight: bold;
       cursor: pointer;
+      margin-bottom: 10px;
     }
 
     button:hover {
       background: #0ea5e9;
+    }
+
+    .botones-sesion {
+      display: none;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .boton-actualizar {
+      background: #22c55e;
+      color: #ffffff;
+    }
+
+    .boton-actualizar:hover {
+      background: #16a34a;
+    }
+
+    .boton-cerrar {
+      background: #ef4444;
+      color: #ffffff;
+    }
+
+    .boton-cerrar:hover {
+      background: #dc2626;
     }
 
     .boton-tienda {
@@ -212,23 +237,31 @@
       </div>
     </div>
 
-    <input 
-      type="text" 
-      id="usuario" 
-      placeholder="Usuario: ADM1106"
-      onclick="limpiarConsulta()" 
-      onfocus="limpiarConsulta()"
-    >
+    <div id="loginBox">
+      <input 
+        type="text" 
+        id="usuario" 
+        placeholder="Usuario: ADM1106"
+      >
 
-    <input 
-      type="password" 
-      id="contrasena" 
-      placeholder="Contraseña"
-      onclick="limpiarConsulta()" 
-      onfocus="limpiarConsulta()"
-    >
+      <input 
+        type="password" 
+        id="contrasena" 
+        placeholder="Contraseña"
+      >
 
-    <button onclick="buscarTickets()">Consultar mis tickets</button>
+      <button onclick="buscarTickets()">Consultar mis tickets</button>
+    </div>
+
+    <div class="botones-sesion" id="botonesSesion">
+      <button class="boton-actualizar" onclick="actualizarTickets()">
+        🔄 Actualizar tickets
+      </button>
+
+      <button class="boton-cerrar" onclick="cerrarSesion()">
+        🚪 Cerrar sesión
+      </button>
+    </div>
 
     <a href="https://catalogo.treinta.co/elliotentertainment" target="_blank" class="boton-tienda">
       🛒 Visitar tienda virtual Elliot
@@ -253,7 +286,10 @@
   <script>
     const API_URL = "PEGA_AQUI_TU_LINK_DE_APPS_SCRIPT";
 
-    function limpiarConsulta() {
+    let usuarioSesion = "";
+    let contrasenaSesion = "";
+
+    function limpiarMensajes() {
       const resultado = document.getElementById("resultado");
       const error = document.getElementById("error");
 
@@ -266,32 +302,60 @@
       const usuario = document.getElementById("usuario").value.trim();
       const contrasena = document.getElementById("contrasena").value.trim();
 
+      if (usuario === "" || contrasena === "") {
+        mostrarError("Por favor ingresa tu usuario y contraseña.");
+        return;
+      }
+
+      usuarioSesion = usuario;
+      contrasenaSesion = contrasena;
+
+      await consultarBaseDatos(usuarioSesion, contrasenaSesion, true);
+    }
+
+    async function actualizarTickets() {
+      if (usuarioSesion === "" || contrasenaSesion === "") {
+        mostrarError("La sesión no está activa. Ingresa nuevamente tus datos.");
+        cerrarSesion();
+        return;
+      }
+
+      await consultarBaseDatos(usuarioSesion, contrasenaSesion, false);
+    }
+
+    async function consultarBaseDatos(usuario, contrasena, iniciarSesion) {
       const resultado = document.getElementById("resultado");
       const error = document.getElementById("error");
       const cargando = document.getElementById("cargando");
+      const loginBox = document.getElementById("loginBox");
+      const botonesSesion = document.getElementById("botonesSesion");
 
       resultado.innerHTML = "";
       resultado.style.display = "none";
       error.style.display = "none";
 
-      if (usuario === "" || contrasena === "") {
-        error.innerText = "Por favor ingresa tu usuario y contraseña.";
-        error.style.display = "block";
-        return;
-      }
-
       try {
         cargando.style.display = "block";
 
-        const url = API_URL + "?usuario=" + encodeURIComponent(usuario) + "&contrasena=" + encodeURIComponent(contrasena);
+        const url = API_URL 
+          + "?usuario=" + encodeURIComponent(usuario) 
+          + "&contrasena=" + encodeURIComponent(contrasena)
+          + "&t=" + new Date().getTime();
+
         const respuesta = await fetch(url);
         const datos = await respuesta.json();
 
         cargando.style.display = "none";
 
         if (!datos.ok) {
+          usuarioSesion = "";
+          contrasenaSesion = "";
+
           error.innerText = "Usuario o contraseña incorrectos. Verifica tus datos.";
           error.style.display = "block";
+
+          loginBox.style.display = "block";
+          botonesSesion.style.display = "none";
           return;
         }
 
@@ -314,11 +378,36 @@
 
         resultado.style.display = "block";
 
+        loginBox.style.display = "none";
+        botonesSesion.style.display = "block";
+
       } catch (e) {
         cargando.style.display = "none";
-        error.innerText = "No se pudo conectar con la base de datos. Revisa el enlace de Apps Script.";
-        error.style.display = "block";
+        mostrarError("No se pudo conectar con la base de datos. Revisa el enlace de Apps Script.");
       }
+    }
+
+    function cerrarSesion() {
+      usuarioSesion = "";
+      contrasenaSesion = "";
+
+      document.getElementById("usuario").value = "";
+      document.getElementById("contrasena").value = "";
+
+      document.getElementById("resultado").innerHTML = "";
+      document.getElementById("resultado").style.display = "none";
+
+      document.getElementById("error").style.display = "none";
+      document.getElementById("cargando").style.display = "none";
+
+      document.getElementById("loginBox").style.display = "block";
+      document.getElementById("botonesSesion").style.display = "none";
+    }
+
+    function mostrarError(mensaje) {
+      const error = document.getElementById("error");
+      error.innerText = mensaje;
+      error.style.display = "block";
     }
   </script>
 </body>
