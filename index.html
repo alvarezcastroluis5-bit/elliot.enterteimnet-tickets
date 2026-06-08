@@ -83,6 +83,7 @@
       color: #ffffff;
       font-weight: bold;
       border-left: 4px solid #38bdf8;
+      line-height: 1.5;
     }
 
     input {
@@ -155,6 +156,25 @@
       background: #eab308;
     }
 
+    .boton-terminos {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      margin-top: 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: bold;
+      text-decoration: none;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    .boton-terminos:hover {
+      background: rgba(255, 255, 255, 0.20);
+    }
+
     .resultado {
       margin-top: 25px;
       text-align: left;
@@ -225,15 +245,25 @@
       <h2>🎁 Premios del Sorteo</h2>
 
       <div class="premio">
-        🥇 1 TV Android de 32 pulgadas
+        🥇 <strong>Primer Premio</strong><br>
+        📺 TV Android de 32 pulgadas<br>
+        📡 3 meses de Flujo TV Completa<br>
+        🎬 1 mes de Netflix Completa
       </div>
 
       <div class="premio">
-        🥈 3 meses de Flujo TV cuenta completa
+        🥈 <strong>Segundo Premio</strong><br>
+        💰 20 USDT
       </div>
 
       <div class="premio">
-        🥉 1 mes de Netflix cuenta completa
+        🥉 <strong>Tercer Premio</strong><br>
+        💵 10 USDT
+      </div>
+
+      <div class="premio">
+        🎁 <strong>Cuarto y Quinto Premio</strong><br>
+        Cuenta de streaming a elección entre las opciones disponibles.
       </div>
     </div>
 
@@ -265,6 +295,10 @@
 
     <a href="https://catalogo.treinta.co/elliotentertainment" target="_blank" class="boton-tienda">
       🛒 Visitar tienda virtual Elliot
+    </a>
+
+    <a href="terminos.pdf" target="_blank" class="boton-terminos">
+      📄 Ver términos y condiciones del sorteo
     </a>
 
     <div class="cargando" id="cargando">
