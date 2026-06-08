@@ -194,7 +194,13 @@
       </div>
     </div>
 
-    <input type="text" id="codigoCliente" placeholder="Ejemplo: ADM1106">
+    <input 
+      type="text" 
+      id="codigoCliente" 
+      placeholder="Ejemplo: ADM1106"
+      onclick="limpiarConsulta()" 
+      onfocus="limpiarConsulta()"
+    >
 
     <button onclick="buscarTickets()">Consultar mis tickets</button>
 
@@ -253,6 +259,15 @@
     function limpiarTexto(texto) {
       if (!texto) return "";
       return texto.replace(/"/g, "").trim();
+    }
+
+    function limpiarConsulta() {
+      const resultado = document.getElementById("resultado");
+      const error = document.getElementById("error");
+
+      resultado.innerHTML = "";
+      resultado.style.display = "none";
+      error.style.display = "none";
     }
 
     function buscarTickets() {
