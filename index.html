@@ -271,7 +271,7 @@
       <input 
         type="text" 
         id="usuario" 
-        placeholder="Usuario: ADM1106"
+        placeholder="Usuario"
       >
 
       <input 
@@ -322,15 +322,6 @@
 
     let usuarioSesion = "";
     let contrasenaSesion = "";
-
-    function limpiarMensajes() {
-      const resultado = document.getElementById("resultado");
-      const error = document.getElementById("error");
-
-      resultado.innerHTML = "";
-      resultado.style.display = "none";
-      error.style.display = "none";
-    }
 
     async function buscarTickets() {
       const usuario = document.getElementById("usuario").value.trim();
@@ -405,7 +396,7 @@
           <div class="card">
             <h2>${datos.nombre}</h2>
             <p><strong>Usuario:</strong> ${datos.usuario}</p>
-            <p><strong>Celular:</strong> ${datos.celular}</p>
+            <p><strong>Cédula de identidad:</strong> ${datos.celular}</p>
             <p><strong>Estado:</strong> ${datos.estado}</p>
             <p><strong>Tickets asignados:</strong></p>
             ${ticketsHTML}
